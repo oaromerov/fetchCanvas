@@ -1,19 +1,17 @@
 <?php
-header('Content-Type: application/json');
+/*Seteamos el header de "content-type" como "JSON" para que JS lo reconozca como tal*/
 
-$llega = $_POST;
-//$llega = json_decode(file_get_contents($_POST), true);
-//var_dump($llega);
+header('Content-Type: application/json);
 
-//Seteamos el header de "content-type" como "JSON" para que jQuery lo reconozca como tal
+//var_dump($_POST);
 
-    $datos = array(
-        'estado' => 'ok',
-        'x' => $llega[posX], //$llega.posX, 
-        'y' => $llega[posY], //$llega.posY,
-        'valor' => 'responde'
-    );    
+$datosRespuesta = array(
+    'estado' => 'ok',
+    'x' => $_POST[posX],  
+    'y' => $_POST[posY], ,
+    'valor' => 'responde'
+);    
 
+/*Devolvemos el array pasado a JSON como objeto*/
 
-//Devolvemos el array pasado a JSON como objeto
-echo json_encode($datos, JSON_FORCE_OBJECT);
+echo json_encode($datosRespuesta, JSON_FORCE_OBJECT);

@@ -30,7 +30,8 @@ function capturarCoordenada(mouseX, mouseY){
 
     fetch('post.php',{
         method: 'POST',
-        body: datos
+        body: datos,
+        mode: "cors"
     })
     .then(response => {
         if(response.ok){                
