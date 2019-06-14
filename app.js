@@ -1,79 +1,62 @@
 
 var canvas = document.getElementById('defaultCanvas0');
-var respuesta = document.getElementById('respuesta');
+var divRespuesta = document.getElementById('respuesta');
 
 function setup() {
     resizeCanvas(400, 400);
     area = document.getElementById('areaCanvas');
-    area.appendChild(canvas);
+    area.appendChild(canvas);    
+    canvas.addEventListener('click', event => tratarTablero(event.clientX, event.clientY));
+}
+
+function tratarTablero(x, y){
+    console.log('me diste un click en ' + x + ", "+ y);
+    var datos = new FormData();
+
+    datos.append('posX', mouseX);
+    datos.append('posY', mouseY);
+    datos.append('valor', 'H');
+
+    enviarInfo(datos)
+    .then(resultado => {
+        console.log("RESULTADO:");
+        console.log(resultado);
+        divRespuesta.innerHTML = `
+                <div class="alert alert-primary" role="alert">
+                    ${resultado.estado}<br> 
+                    ${resultado.x}<br>
+                    ${resultado.y}<br>
+                    ${resultado.valor}<br>
+                </div>
+            `;
+    })
+    .catch(err => {
+        console.error("MiERROR: " + err);
+        divRespuesta.innerHTML = `
+                <div class="alert alert-danger" role="alert">
+                    ${err} 
+                </div>
+            `;
+    });
+}
+
+async function enviarInfo(datosEnviados){
+    respuesta = await fetch('post.php',{
+        method: 'POST',
+        body: datosEnviados,
+        mode: "cors"
+    });
+
+    recibe = await respuesta.json(); // sé que recibo un json
+    return recibe;
 }
 
 function draw() {
     background(153);
-    if (mouseIsPressed) {
-        capturarCoordenada(mouseX, mouseY);
+    if (mouseIsPressed) {        
         fill(0);
     } else {
         fill(255);
     }
     ellipse(mouseX, mouseY, 80, 80);
-}
-
-function capturarCoordenada(mouseX, mouseY){
-    
-    console.log('me diste un click en ' + mouseX + ", "+ mouseY);
-    var datos = new FormData();
-
-    datos.append('posX', mouseX);
-    datos.append('posY', mouseY);
-    datos.append('valor', 'x');
-
-    fetch('post.php',{
-        method: 'POST',
-        body: datos,
-        mode: "cors"
-    })
-    .then(response => {
-        if(response.ok){                
-            console.log("RESPONSE");
-            console.log(response);
-            response.json();
-        }else{
-            respuesta.innerHTML = `
-                <div class="alert alert-danger" role="alert">
-                    Error en la llamada Ajax 
-                </div>
-            `;
-            throw "Error en la llamada Ajax";
-            }            
-    })
-    .then(data => {
-        console.log("DATA");
-        console.log(data);  
-        if(data){
-            if(data.estado === 'error'){
-                respuesta.innerHTML = `
-                <div class="alert alert-danger" role="alert">
-                    Click 
-                </div>
-                `
-            }else{
-                respuesta.innerHTML = `
-                <div class="alert alert-primary" role="alert">                   
-                ${data.x}<br>${data.y}<br>${data.valor}
-                    </div>
-                `
-            }
-        }else{
-            respuesta.innerHTML = `
-                <div class="alert alert-danger" role="alert">                   
-                No estan llegando los datos!
-                    </div>
-                `
-        }
-        
-    })
-    .catch(err => {
-        console.log(err);
-     });
 }
